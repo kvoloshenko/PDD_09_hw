@@ -1,4 +1,4 @@
-from Card import Card
+from loto_game.Card import Card
 
 class Player:
 
@@ -14,20 +14,30 @@ class Player:
     def get_name(self):
         return self.name
 
+    def set_type(self, type):
+        self.type = type
+
+    def get_type(self):
+        return self.type
+
+    def __init__(self):
+        self.set_type('Human')
+        self.set_card(Card())
+
+
 if __name__ == '__main__':
     players = []
     p1 = Player()
     p1.set_name('Константин')
-    c1 = Card()
+    c1 = p1.get_card()
     c1.set_header('------ Ваша карточка ----------')
-    p1.set_card(c1)
     players.append(p1)
 
     p2 = Player()
     p2.set_name('Компьютер')
-    c2 = Card()
+    p2.set_type('computer')
+    c2 = p2.get_card()
     c2.set_header('---- Карточка компьютера ------')
-    p2.set_card(c2)
     players.append(p2)
 
     for player in players:
