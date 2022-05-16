@@ -14,8 +14,6 @@ def random_array(low, high, size):
 
 
 class Card:
-    nums = []
-    lines = []
 
     def set_nums(self):
         random_integer_array = random_array(1, 90, 15)
@@ -45,8 +43,11 @@ class Card:
         # n3 = cl3.get_nums()
         # print(type(n3), f'n3={n3}')
 
+    def set_header(self, header):
+        self.header = header
+
     def print_card(self):
-        print('-------------------------------')
+        print(self.header)
         for card_line in self.lines:
             nums = card_line.get_nums()
             # print(nums)
@@ -75,6 +76,11 @@ class Card:
             if card_line.is_crossed(): rezault +=1
         if rezault == 3: return True
         else: return  False
+
+    def __init__(self):
+        self.lines = []
+        self.set_nums()
+        self.header = '-------------------------------'
 
 
 class Card_line:
@@ -116,7 +122,7 @@ class Card_line:
 
 if __name__ == '__main__':
     crd = Card()
-    crd.set_nums()
+    crd.set_header('------ Ваша карточка ----------')
     crd.print_card()
     rez = crd.cross_out(1)
     if rez: crd.print_card()
