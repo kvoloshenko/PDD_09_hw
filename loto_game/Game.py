@@ -3,6 +3,11 @@
 from loto_game.Kegs import Kegs
 from loto_game.Player import Player
 
+class ValueTooSmallError(Exception):
+    pass
+
+class ValueTooLargeError(Exception):
+    pass
 
 def enter_yn(msg):
     while True:
@@ -14,45 +19,93 @@ def enter_yn(msg):
             print('Введите Y или N')
     return answer
 
+
+
 class Game:
 
+    def enter_num_players(self, msg):
+        while True:
+            try:
+                # Тот код который может вызвать исключение
+                sum = int(input(msg))
+                if sum < 2: raise ValueTooSmallError
+            except ValueTooSmallError:
+                print('Введите число больше или равное 2-м')
+            except ValueError:
+                # Этот блок срабатывает если было исключение
+                print('Вы ввели не число')
+                print('Введите верное число')
+            else:
+                # Выполняется когда нету ошибок
+                # print(f'sum={sum}')
+                break
+        return sum
+
+    def enter_num_coms(self, msg):
+        while True:
+            try:
+                # Тот код который может вызвать исключение
+                sum = int(input(msg))
+                if sum > self.num_players: raise ValueTooLargeError
+            except ValueTooLargeError:
+                print('Введите число меньшее или равное количеству игроков')
+            except ValueError:
+                # Этот блок срабатывает если было исключение
+                print('Вы ввели не число')
+                print('Введите верное число')
+            else:
+                # Выполняется когда нету ошибок
+                # print(f'sum={sum}')
+                break
+        return sum
+
+    def create_players(self):
+        self.players = []
+        self.num_players = self.enter_num_players('Введите количество игроков:')
+        self.comp_players = self.enter_num_coms('Введите количество компьютеров в игре:')
+        # print(f' num_players={self.num_players} comp_players={self.comp_players}')
+        self.human_players = self.num_players - self.comp_players
+        for i in range (1, self.human_players+1):
+            # print(f'i={i}')
+            p = Player()
+            p.set_name('Игрок №' + str(i))
+            c = p.get_card()
+            c.set_header('--- Ваша карточка: ' + p.get_name() + ' ---')
+            self.players.append(p)
+
+        for i in range(1, self.comp_players + 1):
+            p = Player()
+            p.set_name('Компьютер №' + str(i))
+            p.set_type('computer')
+            c = p.get_card()
+            c.set_header('--- Ваша карточка: ' + p.get_name() + ' ---')
+            self.players.append(p)
+
+
     def run(self):
-        players = []
-        p1 = Player()
-        p1.set_name('Константин')
-        c1 = p1.get_card()
-        c1.set_header('------ Ваша карточка ----------')
-        players.append(p1)
-
-        p2 = Player()
-        p2.set_name('Компьютер')
-        p2.set_type('computer')
-        c2 = p2.get_card()
-        c2.set_header('---- Карточка компьютера ------')
-        players.append(p2)
-
         k = Kegs()
         k.kreate_kegs()
         current = 0
-
         game_over = False
         winner = None
         loser = None
+        self.create_players()
+
         while current < 91:
             cur_num = k.get_next().get_num()
             current = k.get_current()
             # print(f'cur_num={cur_num} current={current}')
             print(f'Новый бочонок: {cur_num} (осталось {90 - current})')
 
-            for player in players:
+            for player in self.players:
                 crd = player.get_card()
                 crd.print_card()
-            for player in players:
+            for player in self.players:
                 crd = player.get_card()
                 # crd.print_card()
                 if player.get_type() == 'Human':
                     # Здесь отличия действий пользователя и компьютера
-                    answer = enter_yn('Зачеркнуть цифру? (y/n)')
+                    answer = enter_yn(player.get_name() + ': Зачеркнуть цифру? (y/n)')
                     #print(f'answer={answer}')
                     if answer == 'Y':
                         rez = crd.cross_out(cur_num)
@@ -71,7 +124,7 @@ class Game:
                 else:  # Действия для компьютера
                     rez = crd.cross_out(cur_num)
                     if rez:
-                        print(f'   Бочонок {cur_num} сыграл!!!')
+                        # print(f'   Бочонок {cur_num} сыграл!!!')
                         crd.print_card()
                     if crd.is_crossed():
                         print('Карточка вычеркнута польностью')
